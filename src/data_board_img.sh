@@ -1,16 +1,13 @@
 #!/bin/bash
-# Update & install dependencies
 sudo apt update -y
 sudo apt install -y docker docker-compose nginx
 
-# Enable and start Docker
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Run Metabase container on port 3000
 sudo docker run -d -p 3000:3000 --name metabase metabase/metabase
 
-# Configure Nginx as reverse proxy
+#configure Nginx as reverse proxy
 cat <<EOT > /etc/nginx/sites-available/metabase
 server {
     listen 80;
@@ -26,6 +23,6 @@ server {
 }
 EOT
 
-# Enable Nginx site config
+#enable Nginx site config
 sudo ln -s /etc/nginx/sites-available/metabase /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
