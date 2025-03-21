@@ -1,17 +1,15 @@
 #!/bin/bash
-sudo apt update -y
-sudo apt install -y docker docker-compose nginx
+sudo yum update -y
+sudo yum install -y nginx certbot python3-certbot-nginx
 
-sudo systemctl enable docker
-sudo systemctl start docker
+sudo systemctl start nginx
+sudo systemctl enable nginx
 
-sudo docker run -d -p 3000:3000 --name metabase metabase/metabase
-
-#configure Nginx as reverse proxy
-cat <<EOT > /etc/nginx/sites-available/metabase
+#configure Nginx reverse proxy for Metabase
+cat <<EOF | sudo tee /etc/nginx/conf.d/metabase.conf
 server {
     listen 80;
-    server_name metabase.example.com; # Change to your actual domain
+    server_name metabase.example.com;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -21,8 +19,12 @@ server {
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
-EOT
+EOF
 
-#enable Nginx site config
-sudo ln -s /etc/nginx/sites-available/metabase /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
+
+#issue SSL certificate with "Let's Encrypt"
+sudo certbot --nginx -d metabase.example.com --non-interactive --agree-tos -m your-email@example.com
+
+#setup automatic SSL renewal
+echo "0 0 * * * root certbot renew --quiet" | sudo tee -a /etc/crontab
