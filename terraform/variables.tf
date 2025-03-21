@@ -12,3 +12,13 @@ variable "email_address" {
   description = "Email Address of deploying user"
   type        = string
 }
+
+variable "db_username" {
+  description = "The Database Username"
+  type        = string
+}
+
+variable "db_password" {
+  description = "The Database Password"
+  type        = string
+}

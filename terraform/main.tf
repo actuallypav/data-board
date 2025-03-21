@@ -45,7 +45,11 @@ resource "aws_instance" "data_board" {
   iam_instance_profile = aws_iam_instance_profile.metabase_s3_output_profile.name
 
   user_data = templatefile("../src/data_board_img.sh", {
-    EMAIL = var.email_address
+    EMAIL   = var.email_address
+    DB_NAME = aws_db_instance.metabase_db.db_name
+    DB_USER = aws_db_instance.metabase_db.username
+    DB_PASS = aws_db_instance.metabase_db.password
+    DB_HOST = aws_db_instance.metabase_db.address
   })
 
   instance_market_options {

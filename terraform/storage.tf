@@ -1,13 +1,19 @@
-resource "aws_ebs_volume" "metabase_storage" {
-  availability_zone = aws_instance.data_board.availability_zone
-  size              = 5 #GB
-  type              = "gp3"
-}
+#1 rds instance with 2 dbs on it
+resource "aws_db_instance" "metabase_db" {
+  identifier            = "metabase-db"
+  engine                = "mysql"
+  engine_version        = "8.0"
+  instance_class        = "db.t3.micro"
+  allocated_storage     = 20
+  max_allocated_storage = 20
+  storage_type          = "gp2"
+  username              = var.db_username
+  password              = var.db_password
+  publicly_accessible   = false
+  skip_final_snapshot   = true
 
-resource "aws_volume_attachment" "metabase_storage_attach" {
-  device_name = "/dev/xvdf"
-  volume_id   = aws_ebs_volume.metabase_storage.id
-  instance_id = aws_instance.data_board.id
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.metabase_subnet_group.name
 }
 
 resource "aws_s3_bucket" "metabase_exports" {
