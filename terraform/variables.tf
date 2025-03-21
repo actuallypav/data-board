@@ -7,3 +7,8 @@ variable "domain_name" {
   description = "The name of the domain"
   type        = string
 }
+
+variable "email_address" {
+  description = "Email Address of deploying user"
+  type        = string
+}

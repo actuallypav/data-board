@@ -42,7 +42,11 @@ resource "aws_instance" "data_board" {
   instance_type          = "t3.small" # 2 vCPU, 2GB RAM
   vpc_security_group_ids = [aws_security_group.allow_metabase.id]
 
-  user_data = file("../src/data_board_img.sh")
+  iam_instance_profile = aws_iam_instance_profile.metabase_s3_output_profile.name
+
+  user_data = templatefile("../src/data_board_img.sh", {
+    EMAIL = var.email_address
+  })
 
   instance_market_options {
     market_type = "spot"
