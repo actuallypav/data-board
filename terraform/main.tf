@@ -46,7 +46,6 @@ resource "aws_instance" "data_board" {
 
   user_data = templatefile("../src/data_board_img.sh", {
     EMAIL   = var.email_address
-    DB_NAME = aws_db_instance.metabase_db.db_name
     DB_USER = aws_db_instance.metabase_db.username
     DB_PASS = aws_db_instance.metabase_db.password
     DB_HOST = aws_db_instance.metabase_db.address

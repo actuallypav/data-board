@@ -19,8 +19,9 @@ echo "/dev/xvdf /mnt/metabase ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab
 sudo docker run -d \
     --name metabase \
     -p 3000:3000 \
+    -v /mnt/metabase:/metabase-data \
     -e "MB_DB_TYPE=mysql" \
-    -e "MB_DB_DBNAME=${DB_NAME}" \
+    -e "MB_DB_DBNAME=metadata_db" \
     -e "MB_DB_PORT=3306" \
     -e "MB_DB_USER=${DB_USER}" \
     -e "MB_DB_PASS=${DB_PASS}" \

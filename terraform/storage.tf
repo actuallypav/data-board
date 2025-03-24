@@ -16,6 +16,24 @@ resource "aws_db_instance" "metabase_db" {
   db_subnet_group_name   = aws_db_subnet_group.metabase_subnet_group.name
 }
 
+#metabase metadata DB
+resource "null_resource" "create_metadata_db" {
+  provisioner "local-exec" {
+    command = <<EOT
+      mysql -h ${aws_db_instance.metabase_db.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE metadata_db;"
+    EOT
+  }
+}
+
+#metabase visualization db
+resource "null_resource" "create_visualization_db" {
+  provisioner "local-exec" {
+    command = <<EOT
+      mysql -h ${aws_db_instance.metabase_db.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE visualization_db;"
+    EOT
+  }
+}
+
 resource "aws_s3_bucket" "metabase_exports" {
   bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
 }
