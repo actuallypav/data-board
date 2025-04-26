@@ -1,2 +1,3 @@
-## Overview
-Under Construction: A dashboard solution using Metabase, IoT devices enrolled with the EST_Service. Designed to collate temperature data and provide valuabel insights to the user.
+# data-board
+Dashboard used in conjuction with devices enrolled with EST_Service, Metabase and AWS
+- Currently still under development due to further work required with AWS IoT Core
