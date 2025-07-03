@@ -40,16 +40,23 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
   ip_protocol       = -1
 }
 
-resource "aws_subnet" "private_db" {
+resource "aws_subnet" "private_db_a" {
   vpc_id                  = aws_vpc.main_data.id
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "euw2-az1"
   map_public_ip_on_launch = false
 }
 
+resource "aws_subnet" "private_db_b" {
+  vpc_id                  = aws_vpc.main_data.id
+  cidr_block              = "10.0.3.0/24"
+  availability_zone       = "euw2-az2"
+  map_public_ip_on_launch = false
+}
+
 resource "aws_db_subnet_group" "metabase_subnet_group" {
   name       = "metabase-subnet-group"
-  subnet_ids = [aws_subnet.private_db.id]
+  subnet_ids = [aws_subnet.private_db_a.id, aws_subnet.private_db_b.id]
 }
 
 resource "aws_security_group" "rds_sg" {
