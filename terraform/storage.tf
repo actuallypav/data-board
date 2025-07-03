@@ -39,7 +39,7 @@ resource "aws_s3_bucket" "metabase_exports" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "ownership" {
-  bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
+  bucket = aws_s3_bucket.metabase_exports.id
 
   rule {
     object_ownership = "BucketOwnerPreferred"
