@@ -81,5 +81,5 @@ resource "null_resource" "create_iot_table" {
     EOT
   }
 
-  depends_on = [ null_resource.create_visualization_db ]
+  depends_on = [null_resource.create_visualization_db]
 }
