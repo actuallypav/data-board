@@ -8,7 +8,7 @@ resource "aws_route53_record" "metabase_dns" {
   type    = "A"
   ttl     = 300
   records = [
-    aws_db_instance.iot_rds_instance
+    aws_db_instance.iot_rds_instance.address
   ]
 }
 
