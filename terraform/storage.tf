@@ -1,5 +1,5 @@
 #1 rds instance with 2 dbs on it
-resource "aws_db_instance" "metabase_db" {
+resource "aws_db_instance" "iot_rds_instance" {
   identifier            = "metabase-db"
   engine                = "mysql"
   engine_version        = "8.0"
@@ -20,7 +20,7 @@ resource "aws_db_instance" "metabase_db" {
 resource "null_resource" "create_metadata_db" {
   provisioner "local-exec" {
     command = <<EOT
-      mysql -h ${aws_db_instance.metabase_db.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE metadata_db;"
+      mysql -h ${aws_db_instance.iot_rds_instance.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE metadata_db;"
     EOT
   }
 }
@@ -29,7 +29,7 @@ resource "null_resource" "create_metadata_db" {
 resource "null_resource" "create_visualization_db" {
   provisioner "local-exec" {
     command = <<EOT
-      mysql -h ${aws_db_instance.metabase_db.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE visualization_db;"
+      mysql -h ${aws_db_instance.iot_rds_instance.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE visualization_db;"
     EOT
   }
 }
@@ -62,4 +62,14 @@ resource "aws_s3_bucket_public_access_block" "block_public_access" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "null_resource" "create_iot_table" {
+  provisioner "local-exec" {
+    command = <<EOT
+      mysql -h ${aws_db_instance.iot_rds_instance.address} \
+            -u ${var.db_username} \
+            -p ${var.db_password} \
+            -D visualization_db
+  }
 }
