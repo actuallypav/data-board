@@ -45,14 +45,14 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
 resource "aws_subnet" "private_db_a" {
   vpc_id                  = aws_vpc.main_data.id
   cidr_block              = "10.0.2.0/24"
-  availability_zone       = "euw2-az1"
+  availability_zone       = "eu-west-2a"
   map_public_ip_on_launch = false
 }
 
 resource "aws_subnet" "private_db_b" {
   vpc_id                  = aws_vpc.main_data.id
   cidr_block              = "10.0.3.0/24"
-  availability_zone       = "euw2-az2"
+  availability_zone       = "eu-west-2b"
   map_public_ip_on_launch = false
 }
 
