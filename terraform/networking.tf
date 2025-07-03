@@ -7,7 +7,9 @@ resource "aws_route53_record" "metabase_dns" {
   name    = "metabase" #metabase.pavest.click
   type    = "A"
   ttl     = 300
-  records = [aws_instance.data_board.public_ip]
+  records = [
+    aws_db_instance.iot_rds_instance
+  ]
 }
 
 #security group
@@ -55,8 +57,11 @@ resource "aws_subnet" "private_db_b" {
 }
 
 resource "aws_db_subnet_group" "metabase_subnet_group" {
-  name       = "metabase-subnet-group"
-  subnet_ids = [aws_subnet.private_db_a.id, aws_subnet.private_db_b.id]
+  name = "metabase-subnet-group"
+  subnet_ids = [
+    aws_subnet.private_db_a.id,
+    aws_subnet.private_db_b.id
+  ]
 }
 
 resource "aws_security_group" "rds_sg" {
@@ -65,13 +70,30 @@ resource "aws_security_group" "rds_sg" {
   vpc_id      = aws_vpc.main_data.id
 
   ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.allow_metabase.id]
+    from_port = 3306
+    to_port   = 3306
+    protocol  = "tcp"
+    security_groups = [
+      aws_security_group.allow_metabase.id,
+      aws_security_group.lambda_sg.id
+    ]
   }
 }
 
+resource "aws_security_group" "lambda_sg" {
+  name        = "lambda_sg"
+  description = "Allow lambda to access RDS"
+  vpc_id      = aws_vpc.main_data.id
+
+  egress {
+    from_port = 3306
+    to_port   = 3306
+    protocol  = "tcp"
+    security_groups = [
+      aws_security_group.rds_sg.id
+    ]
+  }
+}
 
 # #ONLY FOR DEBUGGING
 # resource "aws_vpc_security_group_ingress_rule" "allow_metabas_ui" {
