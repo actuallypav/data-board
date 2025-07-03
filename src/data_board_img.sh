@@ -32,7 +32,7 @@ sudo docker run -d \
 cat <<EOF | sudo tee /etc/nginx/conf.d/metabase.conf
 server {
     listen 80;
-    server_name metabase.example.com;
+    server_name data.${DOMAIN};
 
     location / {
         proxy_pass http://localhost:3000;
@@ -47,7 +47,7 @@ EOF
 sudo systemctl restart nginx
 
 #issue SSL certificate with "Let's Encrypt"
-sudo certbot --nginx -d metabase.example.com --non-interactive --agree-tos -m ${EMAIL}
+sudo certbot --nginx -d data.${DOMAIN} --non-interactive --agree-tos -m ${EMAIL}
 
 #setup automatic SSL renewal
 echo "0 0 * * * root certbot renew --quiet" | sudo tee -a /etc/crontab

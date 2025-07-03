@@ -49,6 +49,7 @@ resource "aws_instance" "data_board" {
     DB_USER = aws_db_instance.iot_rds_instance.username
     DB_PASS = aws_db_instance.iot_rds_instance.password
     DB_HOST = aws_db_instance.iot_rds_instance.address
+    DOMAIN  = var.domain_name
   })
 
   instance_market_options {
