@@ -69,7 +69,17 @@ resource "null_resource" "create_iot_table" {
     command = <<EOT
       mysql -h ${aws_db_instance.iot_rds_instance.address} \
             -u ${var.db_username} \
-            -p ${var.db_password} \
-            -D visualization_db
+            -p${var.db_password} \
+            -D visualization_db \
+            -e "CREATE TABLE IF NOT EXISTS iot_data (
+                  id INT AUTO_INCREMENT PRIMARY KEY,
+                  thingname VARCHAR(50),
+                  time BIGINT,
+                  humidity INT,
+                  temperature INT
+                );"
+    EOT
   }
+
+  depends_on = [ null_resource.create_visualization_db ]
 }
