@@ -54,3 +54,55 @@ resource "aws_iam_instance_profile" "metabase_s3_output_profile" {
   role = aws_iam_role.metabase_s3_output_role.name
 }
 
+
+resource "aws_iam_role" "itr_lambda_exec_role" {
+  name = "itr_lambda_exec_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_rds_policy" {
+  name = "lambda_rds_policy"
+  role = aws_iam_role.itr_lambda_exec_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
+      },
+      {
+        Action = [
+          "rds:*",
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_lambda_permission" "allow_iot" {
+  statement_id  = "AllowExecutionFromIoT"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.iot_to_rds.function_name
+  principal     = "iot.amazonaws.com"
+}
