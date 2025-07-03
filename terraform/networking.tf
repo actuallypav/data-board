@@ -89,13 +89,11 @@ resource "aws_security_group" "lambda_sg" {
     from_port = 3306
     to_port   = 3306
     protocol  = "tcp"
-    security_groups = [
-      aws_security_group.rds_sg.id
-    ]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 }
 
-# #ONLY FOR DEBUGGING
+# #ONLY FOR DEBUGqGING
 # resource "aws_vpc_security_group_ingress_rule" "allow_metabas_ui" {
 #   security_group_id = aws_security_group.allow_metabase.id
 #   cidr_ipv4         = "0.0.0.0/0"
