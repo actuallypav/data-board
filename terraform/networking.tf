@@ -4,11 +4,11 @@ data "aws_route53_zone" "domain" {
 
 resource "aws_route53_record" "metabase_dns" {
   zone_id = data.aws_route53_zone.domain.zone_id
-  name    = "metabase" #metabase.pavest.click
-  type    = "A"
+  name    = "data.${var.domain_name}" #data.${domain}
+  type    = "CNAME"
   ttl     = 300
   records = [
-    aws_db_instance.iot_rds_instance.address
+    aws_instance.data_board.public_dns
   ]
 }
 
