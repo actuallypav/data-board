@@ -2,7 +2,7 @@ resource "aws_lambda_function" "iot_to_rds" {
   filename         = "../src/lambda/iot_to_rds.zip"
   function_name    = "iot_to_rds_lambda"
   role             = aws_iam_role.itr_lambda_exec_role.arn
-  handler          = "lambda_function.lambda_handler"
+  handler          = "main.lambda_handler"
   runtime          = "python3.11"
   timeout          = 10
   source_code_hash = filebase64sha256("../src/lambda/iot_to_rds.zip")
