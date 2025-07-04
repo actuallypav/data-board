@@ -15,6 +15,10 @@ sudo mkdir -p /mnt/metabase
 sudo mount /dev/xvdf /mnt/metabase
 echo "/dev/xvdf /mnt/metabase ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab # persists across reboots
 
+sudo yum install -y docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
 #Run metabase with persistent storage
 sudo docker run -d \
     --name metabase \
@@ -26,6 +30,10 @@ sudo docker run -d \
     -e "MB_DB_USER=${DB_USER}" \
     -e "MB_DB_PASS=${DB_PASS}" \
     -e "MB_DB_HOST=${DB_HOST}" \
+    -e "MB_SETUP_ADMIN_EMAIL=${ADMIN_EMAIL} \
+    -e "MB_SETUP_ADMIN_NAME=Admin" \
+    -e "MB_SETUP_ADMIN_PASSWORD=${ADMIN_PASSWORD}" \
+    -e "MB_SETUP_TOKEN=skip" \
     metabase/metabase
 
 #configure Nginx reverse proxy for Metabase
