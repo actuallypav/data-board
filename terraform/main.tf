@@ -37,18 +37,6 @@ data "aws_ami" "data_board_image" {
   }
 }
 
-resource "null_resource" "userdata_trigger" {
-  triggers = {
-    hash = sha256(templatefile("../src/data_board_img.sh", {
-      EMAIL          = var.email_address
-      DB_USER        = aws_db_instance.iot_rds_instance.username
-      DB_PASS        = aws_db_instance.iot_rds_instance.password
-      DB_HOST        = aws_db_instance.iot_rds_instance.address
-      DOMAIN         = var.domain_name
-    }))
-  }
-}
-
 resource "aws_instance" "data_board" {
   ami                         = data.aws_ami.data_board_image.id
   instance_type               = "t3.small" # 2 vCPU, 2GB RAM
@@ -59,16 +47,18 @@ resource "aws_instance" "data_board" {
 
   iam_instance_profile = aws_iam_instance_profile.metabase_s3_output_profile.name
 
-  depends_on = [null_resource.userdata_trigger]
+  user_data = templatefile("../src/data_board_img.sh", {
+    EMAIL          = var.email_address
+    DB_USER        = aws_db_instance.iot_rds_instance.username
+    DB_PASS        = aws_db_instance.iot_rds_instance.password
+    DB_HOST        = aws_db_instance.iot_rds_instance.address
+    DOMAIN         = var.domain_name
+  })
 
-  lifecycle {
-    replace_triggered_by = [null_resource.userdata_trigger]
-  }
-
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price = 0.0100 #how much max we'll pay for the spot instance
-    }
-  }
+  # instance_market_options {
+  #   market_type = "spot"
+  #   spot_options {
+  #     max_price = 0.0100 #how much max we'll pay for the spot instance
+  #   }
+  # }
 }
