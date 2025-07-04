@@ -1,4 +1,9 @@
 #!/bin/bash
+echo "STEP1 initialising the build"
+
+exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+set -x
+
 echo "EMAIL=${EMAIL}" >> /etc/environment
 
 sudo yum update -y
@@ -55,3 +60,4 @@ sudo certbot --nginx -d data.${DOMAIN} --non-interactive --agree-tos -m ${EMAIL}
 
 #setup automatic SSL renewal
 echo "0 0 * * * root certbot renew --quiet" | sudo tee -a /etc/crontab
+echo "Success!"
