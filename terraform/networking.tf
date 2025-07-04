@@ -56,6 +56,31 @@ resource "aws_subnet" "private_db_b" {
   map_public_ip_on_launch = false
 }
 
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.main_data.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "eu-west-2a"
+  map_public_ip_on_launch = true
+}
+
+resource "aws_internet_gateway" "metabase_gw" {
+  vpc_id = aws_vpc.main_data.id
+}
+
+resource "aws_route_table" "metabase_route" {
+  vpc_id = aws_vpc.main_data.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.metabase_gw.id
+  }
+}
+
+resource "aws_route_table_association" "public_assoc" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.metabase_route.id
+}
+
 resource "aws_db_subnet_group" "metabase_subnet_group" {
   name = "metabase-subnet-group"
   subnet_ids = [
