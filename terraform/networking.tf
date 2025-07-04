@@ -10,6 +10,8 @@ resource "aws_route53_record" "metabase_dns" {
   records = [
     aws_instance.data_board.public_dns
   ]
+
+  depends_on = [aws_instance.data_board]
 }
 
 #security group
