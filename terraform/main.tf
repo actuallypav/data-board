@@ -38,9 +38,11 @@ data "aws_ami" "data_board_image" {
 }
 
 resource "aws_instance" "data_board" {
-  ami                    = data.aws_ami.data_board_image.id
-  instance_type          = "t3.small" # 2 vCPU, 2GB RAM
-  vpc_security_group_ids = [aws_security_group.allow_metabase.id]
+  ami                         = data.aws_ami.data_board_image.id
+  instance_type               = "t3.small" # 2 vCPU, 2GB RAM
+  subnet_id                   = aws_subnet.public_subnet.id
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.allow_metabase.id]
 
   iam_instance_profile = aws_iam_instance_profile.metabase_s3_output_profile.name
 
