@@ -30,10 +30,6 @@ sudo docker run -d \
     -e "MB_DB_USER=${DB_USER}" \
     -e "MB_DB_PASS=${DB_PASS}" \
     -e "MB_DB_HOST=${DB_HOST}" \
-    -e "MB_SETUP_ADMIN_EMAIL=${ADMIN_EMAIL} \
-    -e "MB_SETUP_ADMIN_NAME=Admin" \
-    -e "MB_SETUP_ADMIN_PASSWORD=${ADMIN_PASSWORD}" \
-    -e "MB_SETUP_TOKEN=skip" \
     metabase/metabase
 
 #configure Nginx reverse proxy for Metabase
