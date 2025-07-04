@@ -45,8 +45,6 @@ resource "null_resource" "userdata_trigger" {
       DB_PASS        = aws_db_instance.iot_rds_instance.password
       DB_HOST        = aws_db_instance.iot_rds_instance.address
       DOMAIN         = var.domain_name
-      ADMIN_EMAIL    = var.admin_email
-      ADMIN_PASSWORD = var.admin_password
     }))
   }
 }
@@ -67,10 +65,10 @@ resource "aws_instance" "data_board" {
     replace_triggered_by = [null_resource.userdata_trigger]
   }
 
-  # instance_market_options {
-  #   market_type = "spot"
-  #   spot_options {
-  #     max_price = 0.0100 #how much max we'll pay for the spot instance
-  #   }
-  # }
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = 0.0100 #how much max we'll pay for the spot instance
+    }
+  }
 }
