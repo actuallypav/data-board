@@ -31,6 +31,7 @@ def lambda_handler(event, context):
                 ),
             )
         conn.commit()
+        print("Insert successful")
     finally:
         conn.close()
     return {"statusCode": 200, "body": json.dumps("Data inserted")}
