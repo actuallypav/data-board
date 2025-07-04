@@ -11,7 +11,7 @@ resource "aws_lambda_function" "bootstrap_db" {
     variables = {
       DB_HOST      = aws_db_instance.iot_rds_instance.address
       DB_USER      = var.db_username
-      DB_PASSOWORD = var.db_password
+      DB_PASSWORD = var.db_password
     }
   }
 
