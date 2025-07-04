@@ -16,24 +16,6 @@ resource "aws_db_instance" "iot_rds_instance" {
   db_subnet_group_name   = aws_db_subnet_group.metabase_subnet_group.name
 }
 
-#metabase metadata DB
-resource "null_resource" "create_metadata_db" {
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.iot_rds_instance.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE metadata_db;"
-    EOT
-  }
-}
-
-#metabase visualization db
-resource "null_resource" "create_visualization_db" {
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.iot_rds_instance.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE visualization_db;"
-    EOT
-  }
-}
-
 resource "aws_s3_bucket" "metabase_exports" {
   bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
 }
@@ -64,22 +46,3 @@ resource "aws_s3_bucket_public_access_block" "block_public_access" {
   restrict_public_buckets = true
 }
 
-resource "null_resource" "create_iot_table" {
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.iot_rds_instance.address} \
-            -u ${var.db_username} \
-            -p${var.db_password} \
-            -D visualization_db \
-            -e "CREATE TABLE IF NOT EXISTS iot_data (
-                  id INT AUTO_INCREMENT PRIMARY KEY,
-                  thingname VARCHAR(50),
-                  time BIGINT,
-                  humidity INT,
-                  temperature INT
-                );"
-    EOT
-  }
-
-  depends_on = [null_resource.create_visualization_db]
-}
