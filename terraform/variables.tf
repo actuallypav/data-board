@@ -22,3 +22,13 @@ variable "db_password" {
   description = "The Database Password"
   type        = string
 }
+
+variable "admin_email" {
+  description = "The Email for the Metabase Admin Account"
+  type        = string
+}
+
+variable "admin_password" {
+  description = "The Password for the Metabase Admin Account"
+  type        = string
+}
