@@ -55,5 +55,5 @@ resource "null_resource" "package_lambda" {
 
   triggers = {
     always_run = timestamp()
-  } 
+  }
 }

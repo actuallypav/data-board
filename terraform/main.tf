@@ -48,11 +48,11 @@ resource "aws_instance" "data_board" {
   iam_instance_profile = aws_iam_instance_profile.metabase_s3_output_profile.name
 
   user_data = templatefile("../src/data_board_img.sh", {
-    EMAIL          = var.email_address
-    DB_USER        = aws_db_instance.iot_rds_instance.username
-    DB_PASS        = aws_db_instance.iot_rds_instance.password
-    DB_HOST        = aws_db_instance.iot_rds_instance.address
-    DOMAIN         = var.domain_name
+    EMAIL   = var.email_address
+    DB_USER = aws_db_instance.iot_rds_instance.username
+    DB_PASS = aws_db_instance.iot_rds_instance.password
+    DB_HOST = aws_db_instance.iot_rds_instance.address
+    DOMAIN  = var.domain_name
   })
 
   instance_market_options {
