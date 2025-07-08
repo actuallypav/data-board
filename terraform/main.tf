@@ -55,10 +55,10 @@ resource "aws_instance" "data_board" {
     DOMAIN         = var.domain_name
   })
 
-  # instance_market_options {
-  #   market_type = "spot"
-  #   spot_options {
-  #     max_price = 0.0100 #how much max we'll pay for the spot instance
-  #   }
-  # }
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = 0.1000 #how much max we'll pay for the spot instance
+    }
+  }
 }
