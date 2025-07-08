@@ -26,7 +26,7 @@ resource "aws_lambda_function" "iot_to_rds" {
     ]
   }
 
-  depends_on = [aws_db_instance.iot_rds_instance]
+  depends_on = [null_resource.package_lambda, aws_db_instance.iot_rds_instance]
 }
 
 resource "aws_iot_topic_rule" "temp_to_lambda" {
@@ -42,4 +42,18 @@ resource "aws_iot_topic_rule" "temp_to_lambda" {
   depends_on = [
     aws_lambda_permission.allow_iot
   ]
+}
+
+resource "null_resource" "package_lambda" {
+  provisioner "local-exec" {
+    command = <<EOT
+      "cd "${path.module}/../src/lambda/lambda_build"
+      pip install -r requirements.txt -t .
+      zip -r ../iot_to_rds.zip . -x "__pycache__/*"
+    EOT
+  }
+
+  triggers = {
+    always_run = timestamp()
+  } 
 }
