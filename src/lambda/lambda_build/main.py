@@ -18,7 +18,7 @@ def lambda_handler(event, context):
     try:
         with conn.cursor() as cursor:
             sql = """
-                INSERT INTO iot_data (thingname, time, humidity, temperature)
+                INSERT INTO central_heating (thingname, time, humidity, temperature)
                 VALUES (%s, %s, %s, %s)
             """
             cursor.execute(

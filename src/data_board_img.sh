@@ -7,7 +7,7 @@ set -x
 echo "EMAIL=${EMAIL}" >> /etc/environment
 
 sudo yum update -y
-sudo yum install -y nginx certbot python3-certbot-nginx
+sudo yum install -y nginx certbot python3-certbot-nginx mariadb105 docker
 
 sudo systemctl start nginx
 sudo systemctl enable nginx
@@ -20,9 +20,24 @@ sudo mkdir -p /mnt/metabase
 sudo mount /dev/xvdf /mnt/metabase
 echo "/dev/xvdf /mnt/metabase ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab # persists across reboots
 
-sudo yum install -y docker
 sudo systemctl start docker
 sudo systemctl enable docker
+
+#run sql bootstrap logic
+mysql -u "${DB_USER}" -p"${DB_PASS}" -h "${DB_HOST}" <<EOF
+CREATE DATABASE IF NOT EXISTS visualization_db;
+CREATE DATABASE IF NOT EXISTS metadata_db;
+
+USE visualization_db;
+
+CREATE TABLE IF NOT EXISTS central_heating (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    thingname VARCHAR(50),
+    time BIGINT,
+    humidity INT,
+    temperature INT
+);
+EOF
 
 #Run metabase with persistent storage
 sudo docker run -d \
