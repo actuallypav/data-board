@@ -1,3 +1,5 @@
 terraform.tfvars
 .terraform.lock.hcl
 .terraform/*
+src/lambda/lambda_build/py*
+src/lambda/lambda_build/Py*
