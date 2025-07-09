@@ -47,7 +47,7 @@ resource "aws_iot_topic_rule" "temp_to_lambda" {
 resource "null_resource" "package_lambda" {
   provisioner "local-exec" {
     command = <<EOT
-      "cd "${path.module}/../src/lambda/lambda_build"
+      cd "${path.module}/../src/lambda/lambda_build"
       pip install -r requirements.txt -t .
       zip -r ../iot_to_rds.zip . -x "__pycache__/*"
     EOT
