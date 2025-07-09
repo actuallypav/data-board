@@ -5,6 +5,9 @@ exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&
 set -x
 
 echo "EMAIL=${EMAIL}" >> /etc/environment
+echo "DOMAIN=${DOMAIN}" >> /etc/environment
+
+source /etc/environment
 
 sudo yum update -y
 sudo yum install -y nginx certbot python3-certbot-nginx mariadb105 docker
@@ -16,17 +19,19 @@ if ! sudo file -s /dev/xvdf | grep -q "ext4"; then
     sudo mkfs -t ext4 /dev/xvdf
 fi
 
-sudo mkdir -p /mnt/metabase
-sudo mount /dev/xvdf /mnt/metabase
-echo "/dev/xvdf /mnt/metabase ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab # persists across reboots
+sudo mkdir -p /mnt/grafana
+sudo mount /dev/xvdf /mnt/grafana
+echo "/dev/xvdf /mnt/grafana ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab # persists across reboots
+sudo chown -R 472:472 /mnt/grafana
 
 sudo systemctl start docker
 sudo systemctl enable docker
 
+sudo usermod -aG docker ec2-user
+
 #run sql bootstrap logic
 mysql -u "${DB_USER}" -p"${DB_PASS}" -h "${DB_HOST}" <<EOF
 CREATE DATABASE IF NOT EXISTS visualization_db;
-CREATE DATABASE IF NOT EXISTS metadata_db;
 
 USE visualization_db;
 
@@ -39,24 +44,18 @@ CREATE TABLE IF NOT EXISTS central_heating (
 );
 EOF
 
-#Run metabase with persistent storage
+#Run grafana with persistent storage
 sudo docker run -d \
-    --name metabase \
+    --name grafana \
     -p 3000:3000 \
-    -v /mnt/metabase:/metabase-data \
-    -e "MB_DB_TYPE=mysql" \
-    -e "MB_DB_DBNAME=metadata_db" \
-    -e "MB_DB_PORT=3306" \
-    -e "MB_DB_USER=${DB_USER}" \
-    -e "MB_DB_PASS=${DB_PASS}" \
-    -e "MB_DB_HOST=${DB_HOST}" \
-    metabase/metabase
+    -v /mnt/grafana:/var/lib/grafana \
+    grafana/grafana-oss
 
-#configure Nginx reverse proxy for Metabase
-cat <<EOF | sudo tee /etc/nginx/conf.d/metabase.conf
+#configure Nginx reverse proxy for Grafana
+cat <<EOF | sudo tee /etc/nginx/conf.d/grafana.conf
 server {
     listen 80;
-    server_name data.${DOMAIN};
+    server_name dash.${DOMAIN};
 
     location / {
         proxy_pass http://localhost:3000;
@@ -75,4 +74,4 @@ sudo certbot --nginx -d data.${DOMAIN} --non-interactive --agree-tos -m ${EMAIL}
 
 #setup automatic SSL renewal
 echo "0 0 * * * root certbot renew --quiet" | sudo tee -a /etc/crontab
-echo "Success!"
+echo "Grafana setup complete!"
