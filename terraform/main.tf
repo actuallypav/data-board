@@ -23,7 +23,7 @@ resource "aws_vpc" "main_data" {
   cidr_block = "10.0.0.0/16"
 }
 
-#metabase instance
+#grafana instance
 data "aws_ami" "data_board_image" {
   most_recent = true
   owners      = ["amazon"]
@@ -37,15 +37,21 @@ data "aws_ami" "data_board_image" {
   }
 }
 
-resource "aws_instance" "data_board" {
+resource "null_resource" "user_data_hash" {
+  triggers = {
+    script_checksum = filesha256("../src/data_board_img.sh")
+  }
+}
+
+resource "aws_instance" "grafana_server" {
   ami                         = data.aws_ami.data_board_image.id
-  instance_type               = "t4g.micro" # 2 vCPU, 2GB RAM
+  instance_type               = "t4g.micro"
   subnet_id                   = aws_subnet.public_subnet.id
   associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.allow_metabase.id]
+  vpc_security_group_ids      = [aws_security_group.allow_grafana.id]
   key_name                    = "testing-data-board"
 
-  iam_instance_profile = aws_iam_instance_profile.metabase_s3_output_profile.name
+  iam_instance_profile = aws_iam_instance_profile.grafana_s3_output_profile.name
 
   user_data = templatefile("../src/data_board_img.sh", {
     EMAIL   = var.email_address
@@ -54,6 +60,14 @@ resource "aws_instance" "data_board" {
     DB_HOST = aws_db_instance.iot_rds_instance.address
     DOMAIN  = var.domain_name
   })
+
+  user_data_replace_on_change = true
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.user_data_hash
+    ]
+  }
 
   # instance_market_options {
   #   market_type = "spot"

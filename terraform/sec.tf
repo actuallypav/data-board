@@ -1,5 +1,5 @@
-resource "aws_iam_role" "metabase_s3_output_role" {
-  name = "metabase-s3-output-role"
+resource "aws_iam_role" "grafana_s3_output_role" {
+  name = "grafana-s3-output-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -13,9 +13,9 @@ resource "aws_iam_role" "metabase_s3_output_role" {
   })
 }
 
-resource "aws_iam_policy" "metabase_s3_output_policy" {
-  name        = "metabase-s3-output-policy"
-  description = "Allow Metabase to write exports to S3"
+resource "aws_iam_policy" "grafana_s3_output_policy" {
+  name        = "grafana-s3-output-policy"
+  description = "Allow Grafana to write exports to S3"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -27,7 +27,7 @@ resource "aws_iam_policy" "metabase_s3_output_policy" {
           "s3:GetObject"
         ]
         Resource = [
-          "${aws_s3_bucket.metabase_exports.arn}/*"
+          "${aws_s3_bucket.grafana_exports.arn}/*"
         ]
       },
       {
@@ -36,7 +36,7 @@ resource "aws_iam_policy" "metabase_s3_output_policy" {
           "s3:ListBucket"
         ]
         Resource = [
-          aws_s3_bucket.metabase_exports.arn
+          aws_s3_bucket.grafana_exports.arn
         ]
       }
     ]
@@ -44,14 +44,14 @@ resource "aws_iam_policy" "metabase_s3_output_policy" {
 
 }
 
-resource "aws_iam_role_policy_attachment" "metabase_s3_output_attach" {
-  role       = aws_iam_role.metabase_s3_output_role.name
-  policy_arn = aws_iam_policy.metabase_s3_output_policy.arn
+resource "aws_iam_role_policy_attachment" "grafana_s3_output_attach" {
+  role       = aws_iam_role.grafana_s3_output_role.name
+  policy_arn = aws_iam_policy.grafana_s3_output_policy.arn
 }
 
-resource "aws_iam_instance_profile" "metabase_s3_output_profile" {
-  name = "metabase-s3-output-profile"
-  role = aws_iam_role.metabase_s3_output_role.name
+resource "aws_iam_instance_profile" "grafana_s3_output_profile" {
+  name = "grafana-s3-output-profile"
+  role = aws_iam_role.grafana_s3_output_role.name
 }
 
 
