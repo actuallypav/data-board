@@ -29,7 +29,7 @@ data "aws_ami" "data_board_image" {
   owners      = ["amazon"]
   filter {
     name   = "architecture"
-    values = ["x86_64"]
+    values = ["arm64"]
   }
   filter {
     name   = "name"
@@ -39,7 +39,7 @@ data "aws_ami" "data_board_image" {
 
 resource "aws_instance" "data_board" {
   ami                         = data.aws_ami.data_board_image.id
-  instance_type               = "t3.small" # 2 vCPU, 2GB RAM
+  instance_type               = "t4g.micro" # 2 vCPU, 2GB RAM
   subnet_id                   = aws_subnet.public_subnet.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.allow_metabase.id]
@@ -55,10 +55,10 @@ resource "aws_instance" "data_board" {
     DOMAIN  = var.domain_name
   })
 
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price = 0.1000 #how much max we'll pay for the spot instance
-    }
-  }
+  # instance_market_options {
+  #   market_type = "spot"
+  #   spot_options {
+  #     max_price = 0.1000 #how much max we'll pay for the spot instance
+  #   }
+  # }
 }
