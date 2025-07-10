@@ -7,7 +7,7 @@ This repository sets up a complete AWS infrastructure pipeline that ingests IoT 
 * **Lambda Function:** Parses and processes incoming IoT data.
 * **RDS:** Stores structured IoT data for long-term access and querying.
 * **Terraform:** Manages all infrastructure including networking, security, Lambda, and RDS.
-* **Shell Script:** Assists Docker Image used for fron-end
+* **Shell Script:** Assist Docker Image used for front-end
 
 ## Project Structure
 
