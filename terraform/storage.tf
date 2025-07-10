@@ -1,9 +1,9 @@
 #1 rds instance with 2 dbs on it
-resource "aws_db_instance" "metabase_db" {
-  identifier            = "metabase-db"
+resource "aws_db_instance" "iot_rds_instance" {
+  identifier            = "grafana-db"
   engine                = "mysql"
   engine_version        = "8.0"
-  instance_class        = "db.t3.micro"
+  instance_class        = "db.t4g.micro"
   allocated_storage     = 20
   max_allocated_storage = 20
   storage_type          = "gp2"
@@ -13,33 +13,15 @@ resource "aws_db_instance" "metabase_db" {
   skip_final_snapshot   = true
 
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.metabase_subnet_group.name
+  db_subnet_group_name   = aws_db_subnet_group.grafana_subnet_group.name
 }
 
-#metabase metadata DB
-resource "null_resource" "create_metadata_db" {
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.metabase_db.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE metadata_db;"
-    EOT
-  }
-}
-
-#metabase visualization db
-resource "null_resource" "create_visualization_db" {
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.metabase_db.address} -u ${var.db_username} -p${var.db_password} -e "CREATE DATABASE visualization_db;"
-    EOT
-  }
-}
-
-resource "aws_s3_bucket" "metabase_exports" {
-  bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
+resource "aws_s3_bucket" "grafana_exports" {
+  bucket = "grafana-exports-${data.aws_caller_identity.current.account_id}"
 }
 
 resource "aws_s3_bucket_ownership_controls" "ownership" {
-  bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
+  bucket = aws_s3_bucket.grafana_exports.id
 
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -47,7 +29,7 @@ resource "aws_s3_bucket_ownership_controls" "ownership" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
-  bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
+  bucket = aws_s3_bucket.grafana_exports.id
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -56,10 +38,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
 }
 
 resource "aws_s3_bucket_public_access_block" "block_public_access" {
-  bucket = "metabase-exports-${data.aws_caller_identity.current.account_id}"
+  bucket = aws_s3_bucket.grafana_exports.id
 
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
