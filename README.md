@@ -1,8 +1,8 @@
-# Data Board
+# Overview
 
 This repository sets up a complete AWS infrastructure pipeline that ingests IoT data and stores it in an RDS database using Terraform and a Python-based AWS Lambda function. The data is gathered by 4 ESP8266 positioned around the house that send the data to AWS IoT Core. The current Grafana Dashboard can be found [here](https://dash.pavest.click/public-dashboards/2cd730b9b200402bacd01a4fd4330019).
 
-## Overview
+## Infrastructure
 
 * **Lambda Function:** Parses and processes incoming IoT data.
 * **RDS:** Stores structured IoT data for long-term access and querying.
